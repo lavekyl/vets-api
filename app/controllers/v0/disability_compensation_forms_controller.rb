@@ -19,6 +19,20 @@ module V0
     def submit
       form_content = JSON.parse(request.body.string)
 
+      saved_claim = SavedClaim::DisabilityCompensation::Form526IncreaseOnly.from_hash(form_content)
+      saved_claim.save ? log_success(saved_claim) : log_failure(saved_claim)
+      submission_data = saved_claim.to_submission_data(@current_user)
+
+      jid = EVSS::DisabilityCompensationForm::SubmitForm526IncreaseOnly.start(
+        @current_user.uuid, auth_headers, saved_claim.id, submission_data
+      )
+
+      render json: { data: { attributes: { job_id: jid } } },
+             status: :ok
+    end
+
+    # :nocov:
+    def submit_all_claim
       # TODO: While testing `all claims` submissions we will be merging the submission
       # with a hard coded "completed" form which will gap fill any missing data. This should
       # be removed before `all claims` goes live.
@@ -30,7 +44,7 @@ module V0
       saved_claim.save ? log_success(saved_claim) : log_failure(saved_claim)
       submission_data = saved_claim.to_submission_data(@current_user)
 
-      jid = EVSS::DisabilityCompensationForm::SubmitForm526.perform_async(
+      jid = EVSS::DisabilityCompensationForm::SubmitForm526.start(
         @current_user.uuid, auth_headers, saved_claim.id, submission_data
       )
 
