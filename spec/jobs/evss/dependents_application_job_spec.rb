@@ -26,8 +26,8 @@ RSpec.describe EVSS::DependentsApplicationJob do
 
     it 'submits to the 686 api' do
       VCR.use_cassette(
-        'evss/dependents/all',
-        VCR::MATCH_EVERYTHING
+        'evss/dependents/foo',
+        record: :once
       ) do
         described_class.drain
 
