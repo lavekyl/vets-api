@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'evss/base_service'
-
 module EVSS
   class ClaimsService < BaseService
     include Sentry::RescueEVSSErrors
@@ -9,6 +7,7 @@ module EVSS
     API_VERSION = Settings.evss.versions.claims
     BASE_URL = "#{Settings.evss.url}/wss-claims-services-web-#{API_VERSION}/rest"
     DEFAULT_TIMEOUT = 55 # in seconds
+    STATSD_KEY_PREFIX = 'api.evssclaims'
 
     def initialize(*args)
       super
@@ -36,6 +35,10 @@ module EVSS
 
     def self.breakers_service
       BaseService.create_breakers_service(name: 'EVSS/Claims', url: BASE_URL)
+    end
+
+    def service_name
+      'EVSSClaimsService'
     end
   end
 end

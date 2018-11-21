@@ -88,7 +88,7 @@ class ApplicationController < ActionController::API
           log_message_to_sentry(exception.va900_warning, :warn, i18n_exception_hint: exception.va900_hint)
         end
       end
-      log_exception_to_sentry(exception, extra)
+      log_exception_to_sentry(exception, extra_context: extra)
     end
 
     va_exception =

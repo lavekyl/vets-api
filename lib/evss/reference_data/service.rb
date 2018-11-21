@@ -6,6 +6,7 @@ module EVSS
   module ReferenceData
     class Service < EVSS::Service
       configuration EVSS::ReferenceData::Configuration
+      STATSD_KEY_PREFIX = 'api.evssreferencedata'
 
       def get_countries
         with_monitoring_and_error_handling do

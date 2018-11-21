@@ -11,6 +11,7 @@ module Common
         class_attribute :request_types
         class_attribute :user_agent
         class_attribute :base_request_headers
+        class_attribute :log_timeouts_as_warning
 
         self.open_timeout = 15
         self.read_timeout = 15
@@ -21,6 +22,7 @@ module Common
           'Content-Type' => 'application/json',
           'User-Agent' => user_agent
         }.freeze
+        self.log_timeouts_as_warning = false
 
         def base_path
           raise NotImplementedError, "Subclass #{self.class.name} of Configuration must implement base_path"

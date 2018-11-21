@@ -7,11 +7,13 @@ describe HCA::SOAPParser do
 
   describe '#on_complete' do
     let(:reraised_error) { Common::Client::Errors::HTTPError }
+    let(:status) { 200 }
 
     subject do
       env = double
       allow(env).to receive(:url).and_raise(Common::Client::Errors::HTTPError)
       allow(env).to receive(:body).and_return(body)
+      allow(env).to receive(:status).and_return(status)
 
       expect { parser.on_complete(env) }.to raise_error(reraised_error)
     end
@@ -24,6 +26,15 @@ describe HCA::SOAPParser do
         expect(StatsD).to receive(:increment).with('api.hca.validation_fail')
         expect(Raven).to receive(:tags_context).with(validation: 'hca')
 
+        subject
+      end
+    end
+
+    context 'with a 503 error' do
+      let(:reraised_error) { Timeout::Error }
+      let(:status) { 503 }
+      let(:body) { '<?xml version="1.0" ?><metadata></metadata>' }
+      it 'should raise Timeout::Error' do
         subject
       end
     end

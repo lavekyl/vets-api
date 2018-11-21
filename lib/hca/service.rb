@@ -6,6 +6,7 @@ require 'hca/enrollment_system'
 module HCA
   class Service < Common::Client::Base
     configuration HCA::Configuration
+    STATSD_KEY_PREFIX = 'api.hca'
 
     def initialize(current_user = nil)
       @current_user = current_user

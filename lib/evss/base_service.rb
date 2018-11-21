@@ -37,6 +37,11 @@ module EVSS
 
     def post(url, body = nil, headers = { 'Content-Type' => 'application/json' }, &block)
       conn.post(url, body, headers, &block)
+    rescue Timeout::Error, Faraday::TimeoutError, EVSS::ErrorMiddleware::EVSSBackendServiceError => e
+      Raven.extra_context(service_name: service_name, url: base_url)
+      StatsD.increment("#{self.class::STATSD_KEY_PREFIX}.timeout") if defined? self.class::STATSD_KEY_PREFIX
+      log_exception_to_sentry(e, level: :warning)
+      raise Common::Exceptions::SentryIgnoredGatewayTimeout
     end
 
     def base_url
@@ -55,7 +60,6 @@ module EVSS
       @conn ||= Faraday.new(base_url, headers: @headers, ssl: ssl_options) do |faraday|
         faraday.options.timeout = timeout
         faraday.use      :breakers
-        faraday.request  :rescue_timeout, backend_service: :evss
         faraday.use      Faraday::Response::RaiseError
         faraday.use      EVSS::ErrorMiddleware
         faraday.response :betamocks if @use_mock

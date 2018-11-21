@@ -10,6 +10,7 @@ module EVSS
     BASE_URL = "#{Settings.evss.url}/wss-document-services-web-#{API_VERSION}/rest/"
     # this service is only used from an async worker so long timeout is acceptable here
     DEFAULT_TIMEOUT = 180 # seconds
+    STATSD_KEY_PREFIX = 'api.evssdocuments'
 
     def upload(file_body, document_data)
       rescue_evss_errors(%w[EVSS_15005]) do
@@ -29,6 +30,10 @@ module EVSS
 
     def self.breakers_service
       BaseService.create_breakers_service(name: 'EVSS/Documents', url: BASE_URL)
+    end
+
+    def service_name
+      'EVSSDocumentsService'
     end
   end
 end

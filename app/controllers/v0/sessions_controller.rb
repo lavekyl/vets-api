@@ -67,7 +67,7 @@ module V0
         log_message_to_sentry("SAML Logout failed!\n  " + errors.join("\n  "), :error, extra_context)
       end
     rescue => e
-      log_exception_to_sentry(e, {}, {}, :error)
+      log_exception_to_sentry(e, level: :error)
     ensure
       logout_request&.destroy
 

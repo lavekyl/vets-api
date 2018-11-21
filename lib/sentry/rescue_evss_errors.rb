@@ -10,7 +10,7 @@ module Sentry
       yield
     rescue EVSS::ErrorMiddleware::EVSSError => e
       if e.details&.find { |m| keys.include?(m['key']) }
-        log_exception_to_sentry(e, {}, {}, :warn)
+        log_exception_to_sentry(e, level: :warn)
         raise Sentry::IgnoredError, e.message
       end
       raise

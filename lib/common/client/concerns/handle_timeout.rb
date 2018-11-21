@@ -10,7 +10,7 @@ module Common
           StatsD.increment(@timeout_key) if @timeout_key
           @extra_context ||= {}
           @error_tags_context ||= {}
-          log_exception_to_sentry(error, @extra_context, @error_tags_context, :warn)
+          log_exception_to_sentry(error, extra_context: @extra_context, tags_context: @error_tags_context, level: :warn)
           raise Common::Exceptions::SentryIgnoredGatewayTimeout
         end
       end

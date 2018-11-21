@@ -6,6 +6,8 @@ require 'common/client/middleware/response/soap_parser'
 
 module HCA
   class Configuration < Common::Client::Configuration::SOAP
+    self.log_timeouts_as_warning = true
+
     def self.cert_store(paths)
       store = OpenSSL::X509::Store.new
       Array(paths).each do |path|
@@ -53,12 +55,10 @@ module HCA
     def connection
       Faraday.new(base_path, headers: base_request_headers, request: request_options, ssl: ssl_options) do |conn|
         conn.use :breakers
-        conn.request :rescue_timeout, { backend_service: :hca }, 'api.hca.timeout'
         conn.options.open_timeout = 10  # TODO(molson): Make a config/setting
         conn.options.timeout = 15       # TODO(molson): Make a config/setting
         conn.request :soap_headers
         conn.response :hca_soap_parser
-        conn.response :rescue_timeout, { backend_service: :hca }, 'api.hca.timeout'
         conn.adapter Faraday.default_adapter
       end
     end

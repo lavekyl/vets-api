@@ -17,7 +17,7 @@ describe Common::Client::Middleware::Request::RescueTimeout do
       it 'should rescue Faraday::TimeoutError and raise' do
         Settings.sentry.dsn = 'asdf'
         expect_any_instance_of(Common::Client::Middleware::Request::RescueTimeout).to(
-          receive(:log_exception_to_sentry).with(Exception, Hash, Hash, :warn)
+          receive(:log_exception_to_sentry).with(Exception, extra_context: Hash, tags_context: Hash, level: :warn)
         )
         expect(StatsD).to receive(:increment).with('api.hca.timeout')
         expect { subject.get }.to raise_error(Common::Exceptions::SentryIgnoredGatewayTimeout)

@@ -4,6 +4,7 @@ require 'common/client/configuration/soap'
 
 module EMIS
   class Configuration < Common::Client::Configuration::SOAP
+    self.log_timeouts_as_warning = true
     # :nocov:
     def self.ssl_cert_path
       Settings.emis.client_cert_path
@@ -26,7 +27,6 @@ module EMIS
     def connection
       Faraday.new(base_path, headers: base_request_headers, request: request_options, ssl: ssl_options) do |conn|
         conn.use :breakers
-        conn.request :rescue_timeout, backend_service: :emis
         conn.request :soap_headers
 
         conn.response :soap_parser

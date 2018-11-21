@@ -18,7 +18,10 @@ describe Common::Client::Middleware::Response::RescueTimeout do
       Settings.sentry.dsn = 'asdf'
       expect_any_instance_of(Common::Client::Middleware::Response::RescueTimeout).to(
         receive(:log_exception_to_sentry).with(
-          Common::Exceptions::GatewayTimeout, { env_body: 'timeout' }, { backend_service: :evss }, :warn
+          Common::Exceptions::GatewayTimeout,
+          extra_context: { env_body: 'timeout' },
+          tags_context: { backend_service: :evss },
+          level: :warn
         )
       )
       expect(StatsD).to receive(:increment).with('api.hca.timeout')

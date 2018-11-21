@@ -35,7 +35,7 @@ module EVSS
 
       def non_retryable_error_handler(error)
         upsert_job_status('non_retryable_error', error)
-        log_exception_to_sentry(error, status: :non_retryable_error, jid: jid)
+        log_exception_to_sentry(error, extra_context: { status: :non_retryable_error, jid: jid })
         log_error('non_retryable_error', error)
         metrics.increment_non_retryable(error)
       end

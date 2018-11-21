@@ -14,9 +14,9 @@ module SentryLogging
 
   def log_exception_to_sentry(
     exception,
-    extra_context = {},
-    tags_context = {},
-    level = 'error'
+    extra_context: {},
+    tags_context: {},
+    level: 'error'
   )
     level = normalize_level(level)
     if Settings.sentry.dsn.present?

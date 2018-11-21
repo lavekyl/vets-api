@@ -56,7 +56,25 @@ describe HCA::Service do
               x.inspect == 'Faraday::Adapter::NetHttp'
             end
             conn.adapter :test do |stub|
-              stub.post('/') { [503, { body: 'it took too long!' }, 'timeout'] }
+              stub.post('/') { [503, { body: '<html><body><h1>503 Service Unavailable</h1>No server is available to handle this request.</body></html>' }, 'timeout'] }
+            end
+          end
+        )
+        expect { service.send(:request, :post, '', OpenStruct.new(body: nil)) }.to raise_error(
+          Common::Exceptions::SentryIgnoredGatewayTimeout
+        )
+      end
+    end
+
+    context 'timesout' do
+      it 'rescues and raises SentryIgnoredGatewayTimeout exception' do
+        expect(service).to receive(:connection).and_return(
+          Faraday.new do |conn|
+            conn.builder.handlers = service.send(:connection).builder.handlers.reject do |x|
+              x.inspect == 'Faraday::Adapter::NetHttp'
+            end
+            conn.adapter :test do |stub|
+              stub.post('/') { |_env| raise Faraday::TimeoutError }
             end
           end
         )
